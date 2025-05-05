@@ -15,12 +15,14 @@ const colors = {
 };
 
 let player, obstacles, stars, frame, gameSpeed, score, isGameRunning;
+let coins = [];
+let coinScore = 0;
 
 function resetGame() {
     player = {
         x: 50,
-        y: canvas.height - 60,
-        width: 40,
+        y: canvas.height - 30, // Adjusted to align with the ground
+        width: 20,
         height: 40,
         dy: 0,
         gravity: 0.5,
@@ -42,6 +44,54 @@ function resetGame() {
             size: Math.random() * 3
         });
     }
+}
+
+function createCoin() {
+    if (frame % 150 === 0) { // Create a coin every 150 frames
+        coins.push({
+            x: canvas.width,
+            y: canvas.height - 60 - Math.random() * 100, // Random height above the ground
+            size: 10
+        });
+    }
+}
+
+function drawCoins() {
+    ctx.fillStyle = '#ffd700'; // Gold color for coins
+    coins.forEach(coin => {
+        ctx.beginPath();
+        ctx.arc(coin.x, coin.y, coin.size, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
+
+function updateCoins() {
+    coins.forEach(coin => {
+        coin.x -= gameSpeed; // Move coins to the left
+    });
+
+    // Remove coins that go off-screen
+    coins = coins.filter(coin => coin.x + coin.size > 0);
+}
+
+function detectCoinCollection() {
+    coins.forEach((coin, index) => {
+        if (
+            player.x < coin.x + coin.size &&
+            player.x + player.width > coin.x - coin.size &&
+            player.y < coin.y + coin.size &&
+            player.y + player.height > coin.y - coin.size
+        ) {
+            coins.splice(index, 1); // Remove the collected coin
+            coinScore++; // Increment the coin score
+        }
+    });
+}
+
+function drawCoinScore() {
+    ctx.fillStyle = colors.scoreText;
+    ctx.font = '20px PressStart2P';
+    ctx.fillText(`Coins: ${coinScore}`, 50, 50); // Display coin score
 }
 
 function drawBackground() {
@@ -67,11 +117,28 @@ function updateStars() {
 }
 
 function drawPlayer() {
-    ctx.fillStyle = colors.player;
-    ctx.fillRect(player.x, player.y, player.width, player.height);
+    const legHeight = 10;
+    const legWidth = 8;
+    const bodyWidth = 20;
+    const bodyHeight = 30;
 
-    ctx.fillStyle = '#000';
-    ctx.fillRect(player.x + 25, player.y + 10, 8, 8);
+    // Draw body
+    ctx.fillStyle = colors.player;
+    ctx.fillRect(player.x, player.y - bodyHeight, bodyWidth, bodyHeight);
+
+    // Draw head
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(player.x + 6, player.y - bodyHeight - 10, 8, 8);
+
+    // Animate legs
+    const legOffset = Math.sin(frame / 5) * 5; // Oscillate leg position
+    ctx.fillStyle = '#4b0082';
+
+    // Left leg
+    ctx.fillRect(player.x + 2, player.y - legOffset, legWidth, legHeight);
+
+    // Right leg
+    ctx.fillRect(player.x + 10, player.y + legOffset, legWidth, legHeight);
 }
 
 function updatePlayer() {
@@ -79,8 +146,9 @@ function updatePlayer() {
         player.dy += player.gravity;
         player.y += player.dy;
 
+        // Ensure the player lands exactly on the ground
         if (player.y >= canvas.height - player.height - 20) {
-            player.y = canvas.height - player.height - 20;
+            player.y = canvas.height - player.height - 30; // Reset to ground level
             player.isJumping = false;
             player.dy = 0;
         }
@@ -154,9 +222,15 @@ function gameLoop() {
         drawObstacles();
         updateObstacles();
 
+        createCoin();
+        drawCoins();
+        updateCoins();
+        detectCoinCollection();
+
         detectCollision();
 
         drawScore();
+        drawCoinScore();
 
         score++;
         frame++;
