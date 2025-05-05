@@ -1,0 +1,22 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #2a0a4a;
+    font-family: 'Courier New', monospace;
+}
+
+canvas {
+    display: block;
+    background: #120029;
+    border: 4px solid #8a2be2;
+    box-shadow: 0 0 10px #d896ff, 0 0 20px #d896ff;
+}
+
+@font-face {
+    font-family: 'PressStart2P';
+    src: url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+}
