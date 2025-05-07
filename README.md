@@ -1,6 +1,8 @@
 # challenge_one
 Challenge one requires me to build a game using CoPilot as I am part of Group A
 
+https://gerardmyob.github.io/challenge_one/
+
 ## Prompts used to generate the code from CoPilot:
 - I need to create a HTML5 game using canvas, the game is to be an endless runner game with the inputs spacebar or the Up arrow key for making the character jump. create the code and the files
 - I need the game to be in a retro theme with purple as being a colour theme
